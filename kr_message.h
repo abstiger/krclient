@@ -2,19 +2,18 @@
 #define __KR_MESSAGE_H__
 
 /* The message format for krproject communication:
- * |msgtype(4bytes)|msgid(16bytes)|serverid(26bytes)|clientid(26bytes)|datasrcid(4bytes)|objectkey(48bytes)|msglen(4bytes)|message(msglen bytes)|
+ * |msgtype(4bytes)|msgid(16bytes)|serverid(26bytes)|clientid(26bytes)|datasrcid(4bytes)|msglen(4bytes)|message(msglen bytes)|
  */
 
 #define KR_MSGTYPE_LEN 4
 #define KR_MSGID_LEN 16
 #define KR_SERVERID_LEN 26
 #define KR_CLIENTID_LEN 26
-#define KR_OBJECTKEY_LEN 48
-#define KR_DATASRCID_LEN 4
+#define KR_DATASRC_LEN 4
 #define KR_MSGLEN_LEN 4
 
-#define KR_MSGHEADER_LEN 128
-#define KR_MSGHEADER_FMT "%4d%16s%26s%26s%4d%48s%4d"
+#define KR_MSGHEADER_LEN 80
+#define KR_MSGHEADER_FMT "%4d%16s%26s%26s%4d%4d"
 
 
 /*message type define*/
@@ -71,7 +70,6 @@ typedef struct _kr_message_t
     char        serverid[KR_SERVERID_LEN+1];
     char        clientid[KR_CLIENTID_LEN+1];
     int         datasrc;
-    char        objectkey[KR_OBJECTKEY_LEN+1];
     int         msglen;
     char       *msgbuf;
 }T_KRMessage;
@@ -81,7 +79,7 @@ typedef void (*KRCallBackFunc)(T_KRMessage *apply, T_KRMessage *reply, void *dat
 T_KRMessage *kr_message_alloc(void);
 void kr_message_free(T_KRMessage *krmsg);
 
-int kr_message_read(int fd, T_KRMessage *krmsg);
+T_KRMessage *kr_message_read(int fd);
 int kr_message_write(int fd, T_KRMessage *krmsg);
 
 #endif /* __KR_MESSAGE_H__ */

@@ -12,14 +12,6 @@
 #include "kr_message.h"
 #include "kr_client.h"
 
-void kr_client_tick_time(char *memo)
-{
-    time_t tTime = time(NULL);
-    struct tm *ptmNow = localtime(&tTime);
-    char caTimeString[80] = {0};
-    strftime(caTimeString, sizeof(caTimeString), "%c", ptmNow);
-    printf("%s: time tick:[%s]!\n", memo, caTimeString);
-}
 
 void kr_client_disconnect(T_KRClient *krclient)
 {
@@ -91,72 +83,12 @@ T_KRMessage *kr_client_apply(T_KRClient *krclient, T_KRMessage *apply)
 		return NULL;
     }
 
-    /*alloc reply message*/
-    T_KRMessage *reply = kr_message_alloc();
-    if (reply == NULL) {
-		fprintf(stderr, "kr_message_alloc response failed!\n");
-		return NULL;
-    }
-
     /*get response*/
-    if (kr_message_read(krclient->fd, reply) <= 0) {
+    T_KRMessage *reply = kr_message_read(krclient->fd);
+    if (reply == NULL) {
 		fprintf(stderr, "kr_message_read response failed!\n");
-        kr_message_free(reply);
 		return NULL;
     }
 
     return reply;
-}
-
-int kr_client_apply_file(T_KRClient *krclient, int msgtype, int datasrc, char *applyfile)
-{
-	int iCnt = 0;
-    char buff[1024] = {0};
-
-	FILE *fp = fopen(applyfile, "r");
-	if (fp == NULL) {
-		fprintf(stderr, "fopen applyfile [%s] failed!\n", applyfile);
-		return -1;
-    }
-
-    kr_client_tick_time("start");
-	while(fgets(buff, sizeof(buff), fp) != NULL)
-	{
-		if (buff[0] == ' ') continue;
-
-        /*alloc apply message*/
-        T_KRMessage *apply = kr_message_alloc();
-        if (apply == NULL) {
-            fprintf(stderr, "kr_message_alloc request failed!\n");
-            return -1;
-        }
-        apply->msgtype = msgtype;
-        apply->datasrc = datasrc;
-        apply->msgbuf = strdup(buff);
-        apply->msglen = strlen(buff);
-
-        /*get reply message*/
-        T_KRMessage *reply = kr_client_apply(krclient, apply);
-        if (reply == NULL) {
-            fprintf(stderr, "kr_client_apply [%d] [%s] failed!\n", 
-                    apply->msgtype, (char *)apply->msgbuf);
-            kr_message_free(apply);
-            return -1;
-        }
-
-        /*free messages*/
-        kr_message_free(apply);
-        kr_message_free(reply);
-
-        if(iCnt%1000 == 0 && iCnt != 0) {
-            char caNum[20] = {0};
-            snprintf(caNum, sizeof(caNum), "Records:%010d", iCnt);
-            kr_client_tick_time(caNum);
-        }
-		iCnt++;
-    }
-    kr_client_tick_time("stop");
-    fclose(fp);
-
-    return 0;
 }

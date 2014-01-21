@@ -17,6 +17,5 @@ void kr_client_disconnect(T_KRClient *krclient);
 int kr_client_set_timeout(T_KRClient *krclient, int secs);
 
 T_KRMessage *kr_client_apply(T_KRClient *krclient, T_KRMessage *apply);
-int kr_client_apply_file(T_KRClient *krclient, int msgtype, int datasrc, char *applyfile);
 
 #endif /* __KR_CLIENT_H__ */
