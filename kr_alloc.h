@@ -22,5 +22,9 @@ static inline void kr_free(void *ptr)
     if (ptr) free(ptr);
 }
 
+static inline char *kr_strdup(const char *s) 
+{
+    return strdup(s);
+}
 #endif /* __KR_ALLOC_H__ */
 

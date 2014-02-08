@@ -55,13 +55,6 @@
 #define    KR_MSGTYPE_INSERT_EVENT      50
 #define    KR_MSGTYPE_DETECT_EVENT      60
 
-typedef struct _kr_msg_svron_t
-{
-    unsigned int           weights;
-    int                    replica;
-}T_KRMsgSvrOn;
-
-
 typedef struct _kr_message_t
 {
     int         fd;
